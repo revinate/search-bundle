@@ -1,0 +1,10 @@
+services:
+    revinate_search.elasticsearch_service:
+        class: Revinate\SearchBundle\Service\ElasticaService
+        arguments: [@service_container]
+    revinate_search:
+        class: Revinate\SearchBundle\Service\RevinateSearch
+        arguments:
+            connections: "%revinate_search.config.connections%"
+            paths: "%revinate_search.config.paths%"
+            kernel: "@kernel"

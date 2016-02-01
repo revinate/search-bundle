@@ -1,0 +1,35 @@
+{
+  "_all": {
+    "enabled": false
+  },
+  "_id": {
+    "store": "yes",
+    "index": "not_analyzed"
+  },
+  "properties": {
+    "date": {
+      "type": "date",
+      "format": "dateOptionalTime"
+    },
+    "browser": {
+      "type": "string"
+    },
+    "device": {
+      "type": "string"
+    },
+    "views": {
+      "type": "integer"
+    },
+    "tags": {
+      "type": "nested",
+      "properties": {
+          "name": {
+            "type": "string"
+          },
+          "weightage": {
+            "type": "double"
+          }
+      }
+    }
+  }
+}

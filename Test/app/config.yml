@@ -1,0 +1,7 @@
+framework:
+    secret: "Revinate Search Test"
+    test: ~
+
+revinate_search:
+    connection: { host: '127.0.0.1', port: 9200 }
+    paths:  ['Test/Entity']

@@ -1,0 +1,53 @@
+{
+  "name": "revinate/search-bundle",
+  "description": "Revinate Search Bundle",
+  "keywords": [
+    "symfony2",
+    "elasticsearch",
+    "lucene",
+    "search",
+    "doctrine",
+    "odm",
+    "orm"
+  ],
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "homepage": "https://github.com/revinate/search-bundle",
+  "authors": [
+    {
+      "name": "Revinate"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.0",
+    "doctrine/common": ">=2.3.0",
+    "phpoption/phpoption": ">=0.9",
+    "symfony/yaml": ">=2.4.8",
+    "symfony/dependency-injection": ">=2.4.8",
+    "symfony/config": ">=2.4.8"
+  },
+  "suggest": {
+    "ruflin/Elastica": "Elastica version correlating to your ElasticSearch installation is required."
+  },
+  "require-dev": {
+    "doctrine/orm": "~2.4",
+    "phpoption/phpoption": ">=0.9",
+    "symfony/console": ">=2.4.8",
+    "symfony/framework-bundle": ">=2.4.8",
+    "phpunit/phpunit": ">=4.6.9",
+    "symfony/finder": ">=2.4.8",
+    "symfony/process": ">=2.4.8",
+    "symfony/browser-kit": ">=2.4.8"
+  },
+  "autoload": {
+    "psr-0": {
+      "Revinate\\SearchBundle\\": ""
+    }
+  },
+  "autoload-dev": {
+    "psr-0": {
+      "Revinate\\SearchBundle\\Test\\": "Test/app"
+    }
+  },
+  "target-dir": "Revinate/SearchBundle"
+}
