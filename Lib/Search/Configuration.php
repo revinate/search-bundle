@@ -41,6 +41,17 @@ class Configuration
      * @var array
      */
     private $attributes;
+    /**
+     * @var array
+     */
+    private $paths;
+
+    /**
+     * @param array $paths
+     */
+    public function setPaths(array $paths) {
+        $this->paths = $paths;
+    }
 
     /**
      * Gets the cache driver implementation that is used for the mapping metadata.
@@ -51,7 +62,7 @@ class Configuration
     public function getMetadataDriverImpl()
     {
         if (!isset($this->attributes['concreteMetadataDriver'])) {
-            $this->attributes['concreteMetadataDriver'] = $this->newDefaultAnnotationDriver();
+            $this->attributes['concreteMetadataDriver'] = $this->newDefaultAnnotationDriver($this->paths);
         }
 
         return $this->attributes['concreteMetadataDriver'];

@@ -8,3 +8,39 @@ services:
             connections: "%revinate_search.config.connections%"
             paths: "%revinate_search.config.paths%"
             kernel: "@kernel"
+    revinate_search.search_manager:
+        class: Revinate\SearchBundle\Lib\Search\SearchManager
+        arguments:
+            config: "@revinate_search.internal.configuration"
+            client: "@revinate_search.internal.client"
+            eventManager: "@revinate_search.internal.event_manager"
+    revinate_search.mapping_manager:
+        class: Revinate\SearchBundle\Lib\Search\ElasticSearch\MappingManager
+        arguments:
+            sm: "@revinate_search.search_manager"
+            env: "%revinate_search.config.env%"
+
+    # Private services
+    revinate_search.internal.elasticsearch_callback_serializer:
+        class: Revinate\SearchBundle\Lib\Search\Serializer\CallbackSerializer
+        arguments:
+            serializerCallback: toESDocument
+            deserializerCallback: fromESDocument
+        public: false
+    revinate_search.internal.cache_provider:
+        class: Doctrine\Common\Cache\ArrayCache
+        public: false
+    revinate_search.internal.elastica.client:
+        class: Elastica\Client
+        arguments:
+            config: "%revinate_search.config.connections%"
+        public: false
+    revinate_search.internal.event_manager:
+        class: Doctrine\Common\EventManager
+        public: false
+    revinate_search.abstract.configuration:
+        class: Revinate\SearchBundle\Lib\Search\Configuration
+        public: false
+    revinate_search.abstract.client:
+        class: Revinate\SearchBundle\Lib\Search\ElasticSearch\Client
+        public: false

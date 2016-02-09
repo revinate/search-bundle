@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('paths')
                     ->prototype('scalar')->end()->defaultValue(array())
                 ->end()
+                ->scalarNode('env')->end()
             ->end()
         ;
         return $treeBuilder;
