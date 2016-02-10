@@ -2,7 +2,7 @@
 
 namespace Revinate\SearchBundle\Command;
 
-use Revinate\SearchBundle\Service\RevinateSearch;
+use Revinate\SearchBundle\Lib\Search\ElasticSearch\MappingManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class IndexSetupCommand
  *
- * Update the revinate search schemas, including the update for both of indices and templates
+ * Update the schemas, including the update for both indices and templates
  *
  * @package Revinate\SearchBundle\Command
  */
@@ -18,8 +18,8 @@ class IndexSetupCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'revinate:search:schema-update';
 
-    /** @var RevinateSearch */
-    protected $revinateSearch;
+    /** @var MappingManager */
+    protected $mappingManager;
 
     /**
      * @inheritdoc
@@ -28,7 +28,7 @@ class IndexSetupCommand extends ContainerAwareCommand
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Set up all the indices');
+            ->setDescription('Set up all the indices and templates');
     }
 
     /**
@@ -36,7 +36,7 @@ class IndexSetupCommand extends ContainerAwareCommand
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $this->revinateSearch = $this->getContainer()->get('revinate_search');
+        $this->mappingManager = $this->getContainer()->get('revinate_search.mapping_manager');
     }
 
     /**
@@ -44,7 +44,6 @@ class IndexSetupCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $mappingManager = $this->revinateSearch->getMappingManager();
-        $mappingManager->update();
+        $this->mappingManager->update();
     }
 }

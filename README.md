@@ -19,14 +19,14 @@ revinate_search:
         host: 127.0.0.1
         port: 9200
     paths: ["%kernel.root_dir%/../src/Revinate/SharedBundle/Elasticsearch/Entity", "%kernel.root_dir%/../src/Inguest/GRMBundle"]
+    env: dev
 ```
 For `paths`, specify the location of all your Elasticsearch entities within your project.
 
-You can now access the features of this bundle through the `revinate_search` service.
+You can now access the features of this bundle through the predefined services.
 ```php
-$revinateSearch = $this->getContainer()->get('revinate_search');
-$searchManager = $revinateSearch->getSearchManager();
-$mappingManager = $revinateSearch->getMappingManager();
+$searchManager = $this->getContainer()->get('revinate_search.search_manager');
+$mappingManager = $this->getContainer()->get('revinate_search.mapping_manager');
 ```
 
 ## Mappings ##
