@@ -24,7 +24,6 @@ use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
 use Doctrine\Common\Persistence\ObjectManager;
-use Revinate\SearchBundle\Lib\Search\Exception\DoctrineSearchException;
 use Revinate\SearchBundle\Lib\Search\Exception\InvalidArgumentException;
 use Revinate\SearchBundle\Lib\Search\Mapping\ClassMetadataFactory;
 use Revinate\SearchBundle\Lib\Search\Mapping\Driver\AnnotationDriver;
@@ -41,6 +40,7 @@ class Configuration
      * @var array
      */
     private $attributes;
+
     /**
      * @var array
      */
