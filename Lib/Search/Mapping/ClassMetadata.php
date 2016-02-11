@@ -131,9 +131,9 @@ class ClassMetadata implements ClassMetadataInterface
     public $reflClass;
 
     /**
-     * The ReflectionClass instance of the mapped class.
+     * The ReflectionProperty instances of the mapped class.
      *
-     * @var \ReflectionClass
+     * @var \ReflectionProperty[]
      */
     public $reflFields;
 
@@ -353,6 +353,18 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
+     * Gets a ReflectionProperty for a specific field of the mapped class.
+     *
+     * @param string $name
+     *
+     * @return \ReflectionProperty
+     */
+    public function getReflectionProperty($name)
+    {
+        return isset($this->reflFields[$name]) ? $this->reflFields[$name] : null;
+    }
+
+    /**
      * Checks if the given field name is a mapped identifier for this class.
      *
      * @param string $fieldName
@@ -522,6 +534,19 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
+     * Gets the specified field's value off the given entity.
+     *
+     * @param object $entity
+     * @param string $field
+     *
+     * @return mixed
+     */
+    public function getFieldValue($entity, $field)
+    {
+        return isset($this->reflFields[$field]) ? $this->reflFields[$field]->getValue($entity) : null;
+    }
+
+    /**
      * Returns an array of identifier field names numerically indexed.
      *
      * @return array
@@ -529,6 +554,22 @@ class ClassMetadata implements ClassMetadataInterface
     public function getIdentifierFieldNames()
     {
         // TODO: Implement getIdentifierFieldNames() method.
+    }
+
+    /**
+     * Sets the specified field to the specified value on the given entity.
+     *
+     * @param object $entity
+     * @param string $field
+     * @param mixed  $value
+     *
+     * @return void
+     */
+    public function setFieldValue($entity, $field, $value)
+    {
+        if (isset($this->reflFields[$field])) {
+            $this->reflFields[$field]->setValue($entity, $value);
+        }
     }
 
     /**
