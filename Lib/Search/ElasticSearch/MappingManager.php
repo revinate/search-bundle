@@ -44,6 +44,11 @@ class MappingManager
         // Refresh the templates
         /** @var ClassMetadata $metadata */
         foreach ($metadatas as $metadata) {
+            // if we're in the dev env, set the number of replicas to be 0
+            if ($this->env == 'dev' || $this->env == 'test_local') {
+                $metadata->numberOfReplicas = 0;
+            }
+
             if ($metadata->index && $metadata->type) {
                 $indexToMetadatas[$metadata->index][] = $metadata;
             }
@@ -64,7 +69,7 @@ class MappingManager
 
         // Refresh all the mappings
         foreach ($metadatas as $metadata) {
-            // if we're in the dev env, set the number of replica to be 0
+            // if we're in the dev env, set the number of replicas to be 0
             if ($this->env == 'dev' || $this->env == 'test_local') {
                 $metadata->numberOfReplicas = 0;
             }
