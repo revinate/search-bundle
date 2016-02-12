@@ -20,6 +20,7 @@
 namespace Revinate\SearchBundle\Lib\Search\Event;
 
 use Doctrine\Common\EventArgs;
+use Doctrine\Common\Persistence\ObjectManager;
 use Revinate\SearchBundle\Lib\Search\SearchManager;
 
 /**
@@ -71,6 +72,16 @@ class LifecycleEventArgs extends EventArgs
      * @return SearchManager
      */
     public function getSearchManager()
+    {
+        return $this->sm;
+    }
+
+    /**
+     * Retrieve associated SearchManager.
+     *
+     * @return ObjectManager
+     */
+    public function getObjectManager()
     {
         return $this->sm;
     }
