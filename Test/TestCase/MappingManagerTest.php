@@ -2,6 +2,7 @@
 namespace Revinate\SearchBundle\Test\TestCase;
 
 use Elastica\Index\Settings;
+use Revinate\SearchBundle\Lib\Search\ElasticSearch\MappingManager;
 use Revinate\SearchBundle\Lib\Search\ElasticSearch\RevinateElastica\Template;
 use Revinate\SearchBundle\Service\ElasticaService;
 use Revinate\SearchBundle\Test\Entity\View;
@@ -11,6 +12,11 @@ class MappingManagerTest extends BaseTestCase {
         /** @var ElasticaService elasticaService */
         $elasticaService = $this->getContainer()->get("revinate_search.elasticsearch_service");
         $this->elasticaClient = $elasticaService->getInstance();
+    }
+
+    public function testPresenceOfService()
+    {
+        $this->assertInstanceOf(MappingManager::class, $this->getMappingManager());
     }
 
     public function testUpdate() {
