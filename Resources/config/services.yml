@@ -1,7 +1,7 @@
 services:
     revinate_search.elasticsearch_service:
         class: Revinate\SearchBundle\Service\ElasticaService
-        arguments: [@service_container]
+        arguments: ['@service_container']
     revinate_search:
         class: Revinate\SearchBundle\Service\RevinateSearch
         arguments:

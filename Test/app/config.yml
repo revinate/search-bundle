@@ -1,3 +1,6 @@
+imports:
+    - { resource: parameters.yml }
+
 framework:
     secret: "Revinate Search Test"
     test: ~

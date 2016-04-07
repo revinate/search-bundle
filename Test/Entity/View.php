@@ -2,19 +2,26 @@
 namespace Revinate\SearchBundle\Test\Entity;
 
 use JMS\Serializer\Annotation as JMS;
+use Revinate\SearchBundle\Lib\Search\BaseElasticsearchEntity;
 use Revinate\SearchBundle\Lib\Search\Mapping\Annotations as MAP;
 
 /**
  * @JMS\ExclusionPolicy("all")
- * @MAP\ElasticSearchable(index="test_revinate_search_bundle", type="views", source=true)
- * @MAP\ElasticRoot(name="date_detection", value="false")
+ * @MAP\ElasticSearchable(
+ *     index="test_revinate_search_bundle",
+ *     type="views",
+ *     source=true,
+ *     numberOfReplicas=0,
+ *     numberOfShards=2
+ * )
  */
-class View {
+class View extends BaseElasticsearchEntity {
     const INDEX_NAME = "test_revinate_search_bundle";
     const INDEX_TYPE = "views";
 
     /**
      * @MAP\Id
+     * @MAP\ElasticField(type="string", index="not_analyzed")
      * @JMS\Type("string")
      * @JMS\Expose @JMS\Groups({"api", "store"})
      *
@@ -68,7 +75,7 @@ class View {
     protected $tags;
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getDate()
     {
@@ -76,7 +83,7 @@ class View {
     }
 
     /**
-     * @param mixed $date
+     * @param \DateTime $date
      */
     public function setDate($date)
     {
@@ -84,7 +91,7 @@ class View {
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getBrowser()
     {
@@ -92,7 +99,7 @@ class View {
     }
 
     /**
-     * @param mixed $browser
+     * @param string $browser
      */
     public function setBrowser($browser)
     {
@@ -100,7 +107,7 @@ class View {
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDevice()
     {
@@ -108,7 +115,7 @@ class View {
     }
 
     /**
-     * @param mixed $device
+     * @param string $device
      */
     public function setDevice($device)
     {
@@ -116,7 +123,7 @@ class View {
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getViews()
     {
@@ -124,7 +131,7 @@ class View {
     }
 
     /**
-     * @param mixed $views
+     * @param int $views
      */
     public function setViews($views)
     {
@@ -142,12 +149,13 @@ class View {
     /**
      * @return Tag[]
      */
-    public function getTags() {
+    public function getTags()
+    {
         return $this->tags;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getId()
     {
@@ -157,7 +165,8 @@ class View {
     /**
      * @param $id
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
     }
 
@@ -170,12 +179,12 @@ class View {
             $tagDocuments[] = $tag->toArray();
         }
         return array(
-            "id" => $this->getId(),
-            "device" => $this->getDevice(),
-            "browser" => $this->getBrowser(),
-            "views" => $this->getViews(),
-            "date" => $this->getDate()->format("c"),
-            "tags" => $tagDocuments,
+            'id'      => $this->getId(),
+            'device'  => $this->getDevice(),
+            'browser' => $this->getBrowser(),
+            'views'   => $this->getViews(),
+            'date'    => $this->getDate()->format('c'),
+            'tags'    => $tagDocuments,
         );
     }
 }

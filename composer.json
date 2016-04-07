@@ -19,22 +19,24 @@
     }
   ],
   "require": {
-    "php": ">=5.5.0",
     "doctrine/common": ">=2.3.0",
+    "jms/serializer": ">=1.1.0",
+    "php": ">=5.5.0",
     "phpoption/phpoption": ">=0.9",
-    "symfony/yaml": ">=2.4.8",
-    "symfony/dependency-injection": ">=2.4.8",
-    "symfony/config": ">=2.4.8"
+    "symfony/yaml": ">=2.4.8 <3.0",
+    "symfony/dependency-injection": ">=2.4.8 <3.0",
+    "symfony/config": ">=2.4.8 <3.0"
   },
   "suggest": {
-    "ruflin/Elastica": "Elastica version correlating to your ElasticSearch installation is required."
+    "ruflin/Elastica": "Elastica version correlating to your Elasticsearch installation is required. This bundle uses filters which are deprecated in Elasticsearch 2."
   },
   "require-dev": {
     "doctrine/orm": "~2.4",
     "phpoption/phpoption": ">=0.9",
+    "phpunit/phpunit": ">=4.6.9",
+    "ruflin/elastica": "1.2.1",
     "symfony/console": ">=2.4.8",
     "symfony/framework-bundle": ">=2.4.8",
-    "phpunit/phpunit": ">=4.6.9",
     "symfony/finder": ">=2.4.8",
     "symfony/process": ">=2.4.8",
     "symfony/browser-kit": ">=2.4.8"

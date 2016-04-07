@@ -294,7 +294,7 @@ class SearchManager implements ObjectManager
      * @param int $limit
      * @param int $offset
      *
-     * @return Query
+     * @return \Elastica\Query
      */
     public function generateQueryBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {

@@ -1,0 +1,8 @@
+search-bundle:
+  build: .
+  links:
+    - elasticsearch
+  environment:
+    - ES_HOST=elasticsearch
+elasticsearch:
+  image: elasticsearch:1.2.1

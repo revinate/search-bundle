@@ -1,6 +1,5 @@
 <?php
 
-use JMS\SerializerBundle\JMSSerializerBundle;
 use Revinate\SearchBundle\RevinateSearchBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -30,7 +29,6 @@ class AppKernel extends Kernel {
     {
         return array(
             new FrameworkBundle(),
-            new JMSSerializerBundle(),
             new RevinateSearchBundle(),
         );
     }

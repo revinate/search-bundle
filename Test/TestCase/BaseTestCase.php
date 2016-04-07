@@ -3,9 +3,10 @@ namespace Revinate\SearchBundle\Test\TestCase;
 
 use AppKernel;
 use Elastica\Query;
+use Revinate\SearchBundle\Lib\Search\ElasticSearch\MappingManager;
+use Revinate\SearchBundle\Lib\Search\SearchManager;
 use Revinate\SearchBundle\Service\ElasticaService;
 use Revinate\SearchBundle\Test\Entity\View;
-use Revinate\SearchBundle\Test\Entity\ViewAnalytics;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -25,6 +26,10 @@ class BaseTestCase extends WebTestCase
     protected $index;
     /** @var  \Elastica\Type */
     protected $type;
+    /** @var MappingManager */
+    protected static $mappingManager;
+    /** @var SearchManager */
+    protected static $searchManager;
 
     /**
      * Initialize function, which will only be run once
@@ -35,9 +40,35 @@ class BaseTestCase extends WebTestCase
         ini_set('display_errors', '1');
         ini_set('display_startup_errors', '1');
         if (!self::$initialized) {
-            self::$kernel = new AppKernel('test_local', true);
+            self::$kernel = new AppKernel('test', true);
             self::$kernel->boot();
             self::$initialized = true;
+        }
+
+        self::$mappingManager = self::$kernel->getContainer()->get('revinate_search.mapping_manager');
+        self::$searchManager = self::$kernel->getContainer()->get('revinate_search.search_manager');
+
+        $shutDownCallable = 'Revinate\SearchBundle\Test\TestCase\BaseTestCase::cleanupElasticsearch';
+        register_shutdown_function($shutDownCallable);
+        if (extension_loaded('pcntl')) {
+            pcntl_signal(SIGTERM, $shutDownCallable);
+            pcntl_signal(SIGINT, $shutDownCallable);
+        }
+
+    }
+
+    /**
+     * Cleanup when SIGINT/SIGTERM is received
+     *
+     * @param int $signal
+     */
+    public static function cleanupElasticsearch($signal = null)
+    {
+        // delete all indices after test
+        self::$mappingManager->deleteAllIndices();
+        self::$mappingManager->deleteAllTemplates();
+        if (in_array($signal, [SIGINT, SIGTERM])) {
+            exit();
         }
     }
 
@@ -68,7 +99,10 @@ class BaseTestCase extends WebTestCase
 
     protected function teardown()
     {
-        $this->index->delete();
+        self::cleanupElasticsearch();
+        if (extension_loaded('pcntl')) {
+            pcntl_signal_dispatch();
+        }
     }
 
     /**
@@ -79,6 +113,22 @@ class BaseTestCase extends WebTestCase
     public function getContainer()
     {
         return self::$kernel->getContainer();
+    }
+
+    /**
+     * @return SearchManager
+     */
+    protected function getSearchManager()
+    {
+        return self::$searchManager;
+    }
+
+    /**
+     * @return MappingManager
+     */
+    protected function getMappingManager()
+    {
+        return self::$mappingManager;
     }
 
     /**

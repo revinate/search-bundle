@@ -8,8 +8,6 @@ abstract class BaseElasticsearchEntity
 {
     /** @var string Index type (override in entity implementation) */
     const INDEX_TYPE = null;
-    /** @var string Full class name (override in entity implementation) */
-    const CLASS_NAME = null;
 
     /**
      * Constructor
@@ -40,7 +38,7 @@ abstract class BaseElasticsearchEntity
      */
     public static function getClassName()
     {
-        return static::CLASS_NAME;
+        return static::class;
     }
 
     /**
