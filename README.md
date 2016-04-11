@@ -124,8 +124,8 @@ $mappingManager->deleteAllTemplates();
 Typically, only the create and update operations are used. They are wrapped in a predefined command `revinate:search:schema-update` for convenience.
 The deletion operations are useful for data tear down in unit testing.
 
-### Time series index ###
-One common use case we're using for indexing strategy is time series index, to make a index into time series based, here's an example of a time series index:
+### Time Series Index ###
+One common indexing strategy uses a time series index, which partitions an index into multiple time series based indices. Here's an example of a time series index:
 ```php
 * @ElasticSearchable(
  *      index="post",
@@ -141,12 +141,12 @@ class Post extends \Revinate\SearchBundle\Lib\Search\BaseElasticsearchEntity {
   protected $createdAt;
 }
 ```
-There're two things needed to do, first you will need to define the scale of the time series in the `@ElasticSearchable` annotation which can be yearly, monthly and daily, etc. Then you will need to define a field as a field series field by adding the annotation `@TimeSeriesField`.
+First define the scale of the time series in the `@ElasticSearchable` annotation which can be yearly, monthly, or daily. Then define a date field as a time series field by adding the annotation `@TimeSeriesField`.
 
-For time series index, everytime you run the command `revinate:search:schema-update`, Doctrine Search will automatically create the index of the next time peried if necessary and also update the index template based on the mapping. When you index a document to a time series index, the field with `@TimeSeriesField` will be check to index the document into the expected index, for example a `Post` created at 2015-01-01 will be indexed into the index `post_2015_01`
+For a time series index, every time you run the command `revinate:search:schema-update`, this search bundle will automatically create the index of the next time period if necessary and also update the index template based on the mapping. When you index a document to a time series index, the field with `@TimeSeriesField` will be used to determine the index the document will be indexed into, for example a `Post` created at 2015-01-01 will be indexed into the index `post_2015_01`.
 
-### Parent and child index ###
-Sometimes we will need parent-child structure into in index, as the example below:
+### Parent and Child Index ###
+Sometimes we will need a parent-child structure into an index, as the example below:
 ```php
 /*
  * @ElasticSearchable(
@@ -174,7 +174,7 @@ class Comment extends \Revinate\SearchBundle\Lib\Search\BaseElasticsearchEntity 
      $postId;
 }
 ```
-You can define the parent type in the `@ElasticSearchable` annotation by adding `parent="parent_type"`. The code above will create an index called `blog` with two types `post` and `comment`, type `comment` will be the child of the type `blog`. When an entity `Comment` is being indexed, the value of the field with annotation `@ParentField` (which is `$postId` in this case) will be used to specify the parent id for the document.
+You can define the parent type in the `@ElasticSearchable` annotation by adding `parent="parent_type"`. The code above will create an index called `blog` with two types `post` and `comment`, and type `comment` will be the child of type `blog`. When an `comment` entity is being indexed, the value of the field with annotation `@ParentField` (which is `$postId` in this case) will be used to specify the parent ID for the document.
 
 ## Indexing ##
 There are two ways of indexing an entity to be stored as an Elasticsearch document.
@@ -220,8 +220,8 @@ $searchManager->flush(); // If you want to refresh the index after the flushing,
 ```
 As you can see from the example above, you can flush entities belonging to different indices and types in one call, and the library will issue one batch request for each type/index.
 
-### Index a document with version for concurrency control ###
-Elasitcsearch provides the support to [versioning](https://www.elastic.co/blog/elasticsearch-versioning-support), which can be used as optimistic locking for concurrency control. In doctrine search, you can use the annotation `@VersionField` to provide a version together with a version type when indexing a documenet , like the example below:
+### Index a Document with Version###
+Elasticsearch provides [versioning support](https://www.elastic.co/blog/elasticsearch-versioning-support), which can be used as optimistic locking strategy for concurrency control. In the search bundle, you can use the annotation `@VersionField` to provide a version together with a version type when indexing a document like the example below:
 ```php
     /**
      * @var int
@@ -297,7 +297,7 @@ $entity = $entityRepo->findOneBy(array(
 ));
 ```
 
-#### Fetching a list of entities with the total number hit the criteria
+#### Fetching Entities with Total Count ####
 ```pph
 /** Doctrine\Search\ElasticsearchEntityCollection $entityCollection **/
 $entityCollection = $entityRepo->findBy(['type' => 'Admin'], ['id' => 'desc'], 10, 0);
@@ -328,7 +328,7 @@ $termQuery = new \Elastica\Query\Term(array('id' => 323));
 $query = new \Elastica\Query($termQuery);
 $entityCollection = $entityRepo->search($query);
 ```
-Also there're two helper to help you generate elastica query/filter from an array of criteria
+Also there are two helpers to help you generate an Elastica query/filter from an array of criteria
 ```php
 $query = $searchManager->generateQueryBy(['id' => 1], ['dob' => 'desc'], 10, 0);
 $filter = $searchManager->generateFilterBy(['id' => 1, 'dob' => '2000-01-01']);
@@ -347,7 +347,7 @@ $query = $searchManager->createQuery()
 /** ElasticsearchEntityCollection $results **/
 $results = $query->getResult();
 ```
-By default, the results will be hydrated as `\Revinate\SearchBundle\Lib\Search\ElasticsearchEntityCollection` which contains a `getTotal()` method for retrieving the total output size, which is useful for pagination. You can bypass the hydration and get an elastica resultsets by setting `$query->setHydrationMode(\Revinate\SearchBundle\Lib\Search\Query::HYDRATE_BYPASS)`.
+By default, the results will be hydrated as `\Revinate\SearchBundle\Lib\Search\ElasticsearchEntityCollection` which contains a `getTotal()` method for retrieving the total output size, which is useful for pagination. You can bypass the hydration and get an Elastica result set by setting `$query->setHydrationMode(\Revinate\SearchBundle\Lib\Search\Query::HYDRATE_BYPASS)`.
 
 ### Aggregation Results ###
 ```php
