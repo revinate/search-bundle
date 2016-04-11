@@ -394,3 +394,14 @@ foreach ($result as $collection) {
 
 ## Serializers ##
 Entities should extend `\Revinate\SearchBundle\Lib\Search\BaseElasticsearchEntity` which uses a default serializer `\Revinate\SearchBundle\Lib\Search\ElasticsearchEntitySerializer` that provides basic enhancements, such as automatically converting date fields to the `\DateTime` type.
+
+# Contributing #
+Clone the repository and install the dependencies:
+```
+git clone https://github.com/revinate/search-bundle.git
+composer install
+```
+Run unit tests
+```
+./vendor/bin/phpunit
+```
