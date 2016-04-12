@@ -5,4 +5,4 @@ search-bundle:
   environment:
     - ES_HOST=elasticsearch
 elasticsearch:
-  image: elasticsearch:1.2.1
+  image: elasticsearch:1.3.9
