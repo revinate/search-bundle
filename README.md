@@ -1,10 +1,10 @@
-# Revinate Search Bundle #
+# Revinate Search Bundle ![Build Status](https://travis-ci.org/revinate/search-bundle.svg?branch=master) #
 A package that wraps the [doctrine/search](https://github.com/doctrine/search) prototype into a [Symfony2](https://symfony.com) bundle, allowing [Doctrine 2 ORM](https://github.com/doctrine/doctrine2)-like interactions with [Elasticsearch](https://www.elastic.co).
 
 # Usage #
 ## Installation ##
 Include this in your `composer.json`
-```
+```json
 {
     "require": {
 	    "revinate/search-bundle": "dev-master"
@@ -13,7 +13,7 @@ Include this in your `composer.json`
 ```
 
 Fill in your configuration settings in `config.yml`
-```
+```yaml
 revinate_search:
     connection:
         host: 127.0.0.1
