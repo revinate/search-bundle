@@ -62,6 +62,12 @@ class Client implements SearchClientInterface
     private $client;
 
     /**
+     * If set to true, use versionType 'force' to allow documents with a lower es_version to overwrite documents with a higher es_version
+     * @var bool
+     */
+    private $forceVersion = false;
+
+    /**
      * @param ElasticaClient $client
      */
     public function __construct(ElasticaClient $client)
@@ -110,7 +116,11 @@ class Client implements SearchClientInterface
                 if (empty($version)) {
                     throw new InvalidArgumentException('Document (index: ' . $elasticaDoc->getIndex() . ' type: ' . $elasticaDoc->getType() . ' id: ' . $document['id'] . ') misses the value for the version');
                 }
-                $elasticaDoc->setVersionType($class->getVersionType());
+                if ($this->getForceVersion() == true) {
+                    $elasticaDoc->setVersionType('force');
+                } else {
+                    $elasticaDoc->setVersionType($class->getVersionType());
+                }
                 $elasticaDoc->setVersion($version);
             }
             $documentsByIndex[$class->getIndexForWrite($document)][] = $elasticaDoc;
@@ -797,5 +807,21 @@ class Client implements SearchClientInterface
             return false;
         }
         return 200 == $response->getStatus();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getForceVersion()
+    {
+        return $this->forceVersion;
+    }
+
+    /**
+     * @param bool $forceVersion
+     */
+    public function setForceVersion($forceVersion)
+    {
+        $this->forceVersion = $forceVersion;
     }
 }
