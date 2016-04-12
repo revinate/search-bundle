@@ -220,7 +220,7 @@ interface SearchClientInterface
     public function setForceVersion($forceVersion);
 
     /**
-     * Set the search client to force accepting documents with a lower version
+     * Get the search client setting whether or not to force accepting documents with a lower version
      *
      * @return bool
      */
