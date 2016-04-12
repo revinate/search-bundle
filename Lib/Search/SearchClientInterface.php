@@ -211,4 +211,18 @@ interface SearchClientInterface
      * @return boolean
      */
     public function deleteTemplate(ClassMetadata $class);
+
+    /**
+     * Set the search client to force accepting documents with a lower version
+     *
+     * @param bool $forceVersion
+     */
+    public function setForceVersion($forceVersion);
+
+    /**
+     * Set the search client to force accepting documents with a lower version
+     *
+     * @return bool
+     */
+    public function getForceVersion();
 }
