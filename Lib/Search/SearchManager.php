@@ -278,12 +278,15 @@ class SearchManager implements ObjectManager
      *
      * @param mixed $object
      * @param bool $refresh
+     * @param bool $forceVersion
      *
      * @throws Exception\DoctrineSearchException
      */
-    public function flush($object = null, $refresh = false)
+    public function flush($object = null, $refresh = false, $forceVersion = false)
     {
+        $this->client->setForceVersion($forceVersion);
         $this->unitOfWork->commit($object, $refresh);
+        $this->client->setForceVersion(false);
     }
 
     /**
