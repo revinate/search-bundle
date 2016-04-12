@@ -284,9 +284,13 @@ class SearchManager implements ObjectManager
      */
     public function flush($object = null, $refresh = false, $forceVersion = false)
     {
-        $this->client->setForceVersion($forceVersion);
+        if ($forceVersion) {
+            $this->client->setForceVersion(true);
+        }
         $this->unitOfWork->commit($object, $refresh);
-        $this->client->setForceVersion(false);
+        if ($forceVersion) {
+            $this->client->setForceVersion(false);
+        }
     }
 
     /**

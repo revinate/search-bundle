@@ -65,14 +65,13 @@ class Client implements SearchClientInterface
      * If set to true, use versionType 'force' to allow documents with a lower es_version to overwrite documents with a higher es_version
      * @var bool
      */
-    private $forceVersion;
+    private $forceVersion = false;
 
     /**
      * @param ElasticaClient $client
      */
     public function __construct(ElasticaClient $client)
     {
-        $this->forceVersion = false;
         $this->client = $client;
     }
 
