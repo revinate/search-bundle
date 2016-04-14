@@ -30,11 +30,6 @@ services:
     revinate_search.internal.cache_provider:
         class: Doctrine\Common\Cache\ArrayCache
         public: false
-    revinate_search.internal.elastica.client:
-        class: Elastica\Client
-        arguments:
-            config: "%revinate_search.config.connections%"
-        public: false
     revinate_search.internal.event_manager:
         class: Doctrine\Common\EventManager
         public: false

@@ -1,6 +1,7 @@
 <?php
 namespace Revinate\SearchBundle\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -45,6 +46,11 @@ class RevinateSearchExtension extends Extension
         }
         $this->container->setParameter("revinate_search.config", $this->config);
         $this->container->setParameter("revinate_search.config.connections", $this->config['connection']);
+        $this->container->setParameter("revinate_search.config.elastica_client_config",
+            array_merge([
+                'transport' => $this->config['transport']
+            ], $this->config['connection'])
+        );
         $this->container->setParameter("revinate_search.config.paths", $this->config['paths']);
         $this->container->setParameter("revinate_search.config.env", $this->config['env']);
 
@@ -59,6 +65,18 @@ class RevinateSearchExtension extends Extension
             // namespaces also contains the bundle name, so trim it
             $entityNamespaces[$name] = substr($namespace, 0, strlen($namespace) - strlen($name) - 1);
         }
+        
+        $elasticaTransport = $this->config['transport'];
+        if (substr($elasticaTransport, 0, 1) === '@') {
+            $elasticaTransport = new Reference(substr($elasticaTransport, 1));
+        }
+        $elasticaClientDef = new Definition(
+            'Elastica\Client',
+            [array_merge([
+                'transport' => $elasticaTransport
+            ], $this->config['connection'])]
+        );
+        $this->container->setDefinition('revinate_search.internal.elastica.client', $elasticaClientDef->setPublic(false));
 
         $this->container->setDefinition('revinate_search.internal.configuration', new DefinitionDecorator('revinate_search.abstract.configuration'))
             ->addMethodCall('setPaths', [$this->config['paths']])

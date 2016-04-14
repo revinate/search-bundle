@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('paths')
                     ->prototype('scalar')->end()->defaultValue(array())
                 ->end()
+                ->scalarNode('transport')->defaultValue('Http')->end()
                 ->scalarNode('env')->end()
             ->end()
         ;
