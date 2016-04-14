@@ -95,6 +95,15 @@ class Query
     }
 
     /**
+     * Get the query body in array format
+     *
+     * @return array
+     */
+    public function toArray() {
+        return $this->query->toArray();
+    }
+
+    /**
      * Magic method to pass query building to the underlying query
      * object, saving the need to abstract.
      *
