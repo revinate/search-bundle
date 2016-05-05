@@ -26,6 +26,7 @@ class DocumentHelper {
     public function createView($browser, $device, $dateString = null, $views = 1) {
         $date = $dateString ? new \DateTime($dateString) : new \DateTime('now');
         $view = new View();
+        $view->setId(uniqid());
         $view->setBrowser($browser);
         $view->setDevice($device);
         $view->setViews($views);

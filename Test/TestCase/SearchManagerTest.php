@@ -142,6 +142,7 @@ class SearchManagerTest extends BaseTestCase
         $viewRepo = $searchManager->getRepository(View::class);
 
         $view = new View();
+        $view->setId(uniqid());
         $view->setBrowser('safari');
         $view->setDevice('ios');
         $view->setViews(10);
@@ -158,12 +159,49 @@ class SearchManagerTest extends BaseTestCase
         $this->assertNull($view);
     }
 
+    public function testRemoveAll()
+    {
+        $this->createData();
+        $searchManager = $this->getSearchManager();
+        $viewRepo = $searchManager->getRepository(View::class);
+
+        /** @var View[] $views */
+        $views = array();
+        $count = 0;
+        while($count < 5) {
+            $view = new View();
+            $view->setId(uniqid());
+            $view->setBrowser('safari');
+            $view->setDevice('ios');
+            $view->setViews(10);
+            $view->setTags(array(new Tag('pro', 10.0)));
+            $view->setDate(new \DateTime('c'));
+            $viewRepo->save($view, true);
+            $views[] = $view;
+            $count++;
+        }
+
+        foreach($views as $originalView) {
+            $view = $viewRepo->findOneBy(array('id' => $originalView->getId()));
+            $this->assertNotNull($view);
+        }
+
+        $searchManager->getClient()->removeAll($searchManager->getClassMetadata(View::class));
+        $searchManager->flush();
+
+        foreach($views as $originalView) {
+            $view = $viewRepo->findOneBy(array('id' => $originalView->getId()));
+            $this->assertNull($view);
+        }
+    }
+
     public function testUpdate()
     {
         $searchManager = $this->getSearchManager();
         $viewRepo = $searchManager->getRepository(View::class);
 
         $view = new View();
+        $view->setId(uniqid());
         $view->setBrowser('safari');
         $view->setDevice('ios');
         $view->setViews(10);

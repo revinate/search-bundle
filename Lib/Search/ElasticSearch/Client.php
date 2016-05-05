@@ -42,6 +42,7 @@ use Elastica\Type;
 use Elastica\Type\Mapping;
 use Elastica\Document;
 use Elastica\Index;
+use Elastica\Query\AbstractQuery;
 use Elastica\Query\MatchAll;
 use Elastica\Filter\Term;
 use Elastica\Search;
@@ -152,8 +153,8 @@ class Client implements SearchClientInterface
         }
 
         foreach ($idsByIndex as $index => $ids) {
-            $type = $this->getIndex($index)->getType($class->type);
-            $type->deleteByQuery(new Query\Terms('id', $ids));
+            $query = new Query\Terms('id', $ids);
+            $this->deleteByScanScroll($class, $query, $index);
         }
     }
 
@@ -162,9 +163,32 @@ class Client implements SearchClientInterface
      */
     public function removeAll(ClassMetadata $class, $query = null)
     {
-        $type = $this->getIndex($class->getIndexForRead())->getType($class->type);
+        $index = $class->getIndexForRead();
         $query = $query ?: new MatchAll();
-        $type->deleteByQuery($query);
+        $this->deleteByScanScroll($class, $query, $index);
+    }
+
+    /**
+     * Perform a scan and scroll through the results, bulk deleting by result ids
+     *
+     * @param ClassMetadata $class
+     * @param AbstractQuery $scanQuery
+     * @param string        $index
+     */
+    private function deleteByScanScroll(ClassMetadata $class, AbstractQuery $scanQuery, $index) {
+        $type = $this->getIndex($index)->getType($class->type);
+        $query = Query::create($scanQuery);
+        $results = $this->scan($query, [$class]);
+
+        foreach($results as $collection) {
+            $resultIds = array();
+            foreach($collection->getResults() as $result) {
+                $resultIds[] = $result->getId();
+            }
+            $this->client->deleteIds($resultIds, $index, $type);
+        }
+        // Refresh index to clear out deleted ID information
+        $this->getIndex($index)->refresh();
     }
 
     /**
