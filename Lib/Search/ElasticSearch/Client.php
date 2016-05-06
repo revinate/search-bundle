@@ -141,7 +141,7 @@ class Client implements SearchClientInterface
     /**
      * {@inheritDoc}
      */
-    public function removeDocuments(ClassMetadata $class, array $documents)
+    public function removeDocuments(ClassMetadata $class, array $documents, $refresh = false)
     {
         $idsByIndex = array();
 
@@ -153,19 +153,19 @@ class Client implements SearchClientInterface
         }
 
         foreach ($idsByIndex as $index => $ids) {
-            $query = new Query\Terms('id', $ids);
-            $this->deleteByScanScroll($class, $query, $index);
+            $query = new Query\Terms($class->getIdentifier(), $ids);
+            $this->deleteByScanScroll($class, $query, $index, $refresh);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function removeAll(ClassMetadata $class, $query = null)
+    public function removeAll(ClassMetadata $class, $query = null, $refresh = false)
     {
         $index = $class->getIndexForRead();
         $query = $query ?: new MatchAll();
-        $this->deleteByScanScroll($class, $query, $index);
+        $this->deleteByScanScroll($class, $query, $index, $refresh);
     }
 
     /**
@@ -174,11 +174,12 @@ class Client implements SearchClientInterface
      * @param ClassMetadata $class
      * @param AbstractQuery $scanQuery
      * @param string        $index
+     * @param bool          $refresh
      */
-    private function deleteByScanScroll(ClassMetadata $class, AbstractQuery $scanQuery, $index) {
+    private function deleteByScanScroll(ClassMetadata $class, AbstractQuery $scanQuery, $index, $refresh = false) {
         $type = $this->getIndex($index)->getType($class->type);
         $query = Query::create($scanQuery);
-        $results = $this->scan($query, [$class]);
+        $results = $this->scan($query, array($class));
 
         foreach($results as $collection) {
             $resultIds = array();
@@ -188,7 +189,9 @@ class Client implements SearchClientInterface
             $this->client->deleteIds($resultIds, $index, $type);
         }
         // Refresh index to clear out deleted ID information
-        $this->getIndex($index)->refresh();
+        if ($refresh) {
+            $this->getIndex($index)->refresh();
+        }
     }
 
     /**

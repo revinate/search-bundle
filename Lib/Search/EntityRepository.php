@@ -158,16 +158,20 @@ class EntityRepository implements ObjectRepository
     }
 
     /**
-     * Execute a direct delete by query on the associated index and type
+     * Execute a delete on the associated index and type
      *
      * @param BaseElasticsearchEntity $entity
      * @param bool $flush
+     * @param bool $refresh
      */
-    public function delete($entity, $flush = true)
+    public function delete($entity, $flush = true, $refresh = false)
     {
         $this->_sm->remove($entity);
         if ($flush) {
             $this->_sm->flush($entity);
+        }
+        if ($refresh) {
+            $this->_sm->getClient()->refreshIndex($this->getClassMetadata()->getIndexForWrite($entity->toESDocument()));
         }
     }
 

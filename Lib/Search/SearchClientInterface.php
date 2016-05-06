@@ -141,8 +141,9 @@ interface SearchClientInterface
      *
      * @param ClassMetadata $class
      * @param array $documents Indexed by document id
+     * @param bool   $refresh
      */
-    public function removeDocuments(ClassMetadata $class, array $documents);
+    public function removeDocuments(ClassMetadata $class, array $documents, $refresh = false);
 
     /**
      * Remove all documents of a given type from the specified index
@@ -150,8 +151,9 @@ interface SearchClientInterface
      *
      * @param ClassMetadata $class
      * @param object $query
+     * @param bool   $refresh
      */
-    public function removeAll(ClassMetadata $class, $query = null);
+    public function removeAll(ClassMetadata $class, $query = null, $refresh = false);
 
     /**
      * Generate query used by findBy()

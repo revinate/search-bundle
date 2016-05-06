@@ -112,15 +112,16 @@ class EntityRepositoryCollection implements ObjectRepository
     }
 
     /**
-     * Execute a direct delete by query on the associated index and type
+     * Execute a direct delete on the associated index and type
      *
      * @param object $query
+     * @param bool   $refresh
      */
-    public function delete($query)
+    public function delete($query, $refresh = false)
     {
         $classes = $this->getClassMetadata();
         foreach ($classes as $class) {
-            $this->_sm->getClient()->removeAll($class, $query);
+            $this->_sm->getClient()->removeAll($class, $query, $refresh);
         }
     }
 

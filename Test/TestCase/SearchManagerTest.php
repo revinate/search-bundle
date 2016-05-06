@@ -153,10 +153,43 @@ class SearchManagerTest extends BaseTestCase
         $view = $viewRepo->findOneBy(array('browser' => 'safari'));
         $id = $view->getId();
         $searchManager->remove($view);
-        $searchManager->flush();
+        $searchManager->flush(null, true);
 
         $view = $viewRepo->find($id);
         $this->assertNull($view);
+    }
+
+    public function testRemoveMultiple()
+    {
+        $this->createData();
+        $searchManager = $this->getSearchManager();
+        $viewRepo = $searchManager->getRepository(View::class);
+
+        $viewIds = array('multiple1', 'multiple2', 'multiple3');
+        $views = array();
+        foreach($viewIds as $viewId) {
+            $view = new View();
+            $view->setId($viewId);
+            $view->setBrowser('safari');
+            $view->setDevice('ios');
+            $view->setViews(10);
+            $view->setTags(array(new Tag('pro', 10.0)));
+            $view->setDate(new \DateTime('c'));
+            $viewRepo->save($view, true);
+
+            $view = $viewRepo->findOneBy(array('id' => $viewId));
+            $this->assertNotNull($view);
+
+            $views[] = $view;
+        }
+
+        $searchManager->remove($views);
+        $searchManager->flush(null, true);
+
+        foreach($viewIds as $viewId) {
+            $view = $viewRepo->find($viewId);
+            $this->assertNull($view);
+        }
     }
 
     public function testRemoveAll()
@@ -186,7 +219,7 @@ class SearchManagerTest extends BaseTestCase
             $this->assertNotNull($view);
         }
 
-        $searchManager->getClient()->removeAll($searchManager->getClassMetadata(View::class));
+        $searchManager->removeAll($searchManager->getClassMetadata(View::class), null, true);
         $searchManager->flush();
 
         foreach($views as $originalView) {
