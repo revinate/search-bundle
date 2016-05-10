@@ -153,7 +153,8 @@ class SearchManagerTest extends BaseTestCase
         $view = $viewRepo->findOneBy(array('browser' => 'safari'));
         $id = $view->getId();
         $searchManager->remove($view);
-        $searchManager->flush(null, true);
+        $searchManager->flush();
+        sleep(1);
 
         $view = $viewRepo->find($id);
         $this->assertNull($view);
@@ -184,7 +185,8 @@ class SearchManagerTest extends BaseTestCase
         }
 
         $searchManager->remove($views);
-        $searchManager->flush(null, true);
+        $searchManager->flush();
+        sleep(1);
 
         foreach($viewIds as $viewId) {
             $view = $viewRepo->find($viewId);
@@ -219,8 +221,9 @@ class SearchManagerTest extends BaseTestCase
             $this->assertNotNull($view);
         }
 
-        $searchManager->removeAll($searchManager->getClassMetadata(View::class), null, true);
+        $searchManager->removeAll($searchManager->getClassMetadata(View::class));
         $searchManager->flush();
+        sleep(1);
 
         foreach($views as $originalView) {
             $view = $viewRepo->findOneBy(array('id' => $originalView->getId()));

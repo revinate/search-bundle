@@ -279,13 +279,12 @@ class SearchManager implements ObjectManager
      *
      * @param ClassMetadata $class
      * @param object        $query
-     * @param bool          $refresh
      *
      * @throws UnexpectedTypeException
      */
-    public function removeAll(ClassMetadata $class, $query = null, $refresh = false)
+    public function removeAll(ClassMetadata $class, $query = null)
     {
-        $this->client->removeAll($class, $query, $refresh);
+        $this->client->removeAll($class, $query);
     }
 
     /**

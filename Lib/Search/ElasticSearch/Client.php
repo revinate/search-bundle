@@ -141,7 +141,7 @@ class Client implements SearchClientInterface
     /**
      * {@inheritDoc}
      */
-    public function removeDocuments(ClassMetadata $class, array $documents, $refresh = false)
+    public function removeDocuments(ClassMetadata $class, array $documents)
     {
         $idsByIndex = array();
 
@@ -154,18 +154,18 @@ class Client implements SearchClientInterface
 
         foreach ($idsByIndex as $index => $ids) {
             $query = new Query\Terms($class->getIdentifier(), $ids);
-            $this->deleteByScanScroll($class, $query, $index, $refresh);
+            $this->deleteByScanScroll($class, $query, $index);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function removeAll(ClassMetadata $class, $query = null, $refresh = false)
+    public function removeAll(ClassMetadata $class, $query = null)
     {
         $index = $class->getIndexForRead();
         $query = $query ?: new MatchAll();
-        $this->deleteByScanScroll($class, $query, $index, $refresh);
+        $this->deleteByScanScroll($class, $query, $index);
     }
 
     /**
@@ -174,9 +174,8 @@ class Client implements SearchClientInterface
      * @param ClassMetadata $class
      * @param AbstractQuery $scanQuery
      * @param string        $index
-     * @param bool          $refresh
      */
-    private function deleteByScanScroll(ClassMetadata $class, AbstractQuery $scanQuery, $index, $refresh = false) {
+    private function deleteByScanScroll(ClassMetadata $class, AbstractQuery $scanQuery, $index) {
         $type = $this->getIndex($index)->getType($class->type);
         $query = Query::create($scanQuery);
         $results = $this->scan($query, array($class));
@@ -187,10 +186,6 @@ class Client implements SearchClientInterface
                 $resultIds[] = $result->getId();
             }
             $this->client->deleteIds($resultIds, $index, $type);
-        }
-        // Refresh index to clear out deleted ID information
-        if ($refresh) {
-            $this->getIndex($index)->refresh();
         }
     }
 
