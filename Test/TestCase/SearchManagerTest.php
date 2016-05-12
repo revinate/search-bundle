@@ -3,11 +3,14 @@ namespace Revinate\SearchBundle\Test\TestCase;
 
 use Revinate\SearchBundle\Lib\Search\Criteria\Not;
 use Revinate\SearchBundle\Lib\Search\Criteria\Range;
+use Revinate\SearchBundle\Lib\Search\ElasticsearchEntityCollection;
+use Revinate\SearchBundle\Lib\Search\Mapping\ClassMetadata;
 use Revinate\SearchBundle\Lib\Search\Query;
 use Revinate\SearchBundle\Lib\Search\SearchManager;
 use Revinate\SearchBundle\Test\Elastica\DocumentHelper;
 use Revinate\SearchBundle\Test\Entity\Tag;
 use Revinate\SearchBundle\Test\Entity\View;
+use Revinate\SearchBundle\Test\Entity\StatusLog;
 
 class SearchManagerTest extends BaseTestCase
 {
@@ -23,6 +26,14 @@ class SearchManagerTest extends BaseTestCase
             ->createView('opera', 'ios', '-3 month', 5)
             ->createView('opera', 'ios', '-1 week', 2)
             ->createView('chrome', 'android', '+0 day', 10);
+        $docHelper->refresh();
+    }
+
+    protected function createTimeSeriesData()
+    {
+        $docHelper = new DocumentHelper($this->timeSeriesType);
+        $docHelper->createStatusLog('ok')
+            ->createStatusLog('error');
         $docHelper->refresh();
     }
 
@@ -160,6 +171,28 @@ class SearchManagerTest extends BaseTestCase
         $this->assertNull($view);
     }
 
+    public function testRemoveTimeSeries()
+    {
+        $this->createTimeSeriesData();
+        $searchManager = $this->getSearchManager();
+        $statusLogRepo = $searchManager->getRepository(StatusLog::class);
+
+        $statusLog = new StatusLog();
+        $statusLog->setId(uniqid());
+        $statusLog->setStatus('failure');
+        $statusLog->setDate(new \DateTime('c'));
+        $statusLogRepo->save($statusLog, true);
+
+        $statusLog = $statusLogRepo->findOneBy(array('status' => 'failure'));
+        $id = $statusLog->getId();
+        $searchManager->remove($statusLog);
+        $searchManager->flush();
+        sleep(1);
+
+        $statusLog = $statusLogRepo->find($id);
+        $this->assertNull($statusLog);
+    }
+
     public function testRemoveMultiple()
     {
         $this->createData();
@@ -194,6 +227,37 @@ class SearchManagerTest extends BaseTestCase
         }
     }
 
+    public function testRemoveMultipleTimeSeries()
+    {
+        $this->createTimeSeriesData();
+        $searchManager = $this->getSearchManager();
+        $statusLogRepo = $searchManager->getRepository(StatusLog::class);
+
+        $statusLogIds = array('multiple1', 'multiple2', 'multiple3');
+        $statusLogs = array();
+        foreach($statusLogIds as $statusLogId) {
+            $statusLog = new StatusLog();
+            $statusLog->setId($statusLogId);
+            $statusLog->setStatus('failure');
+            $statusLog->setDate(new \DateTime('c'));
+            $statusLogRepo->save($statusLog, true);
+
+            $statusLog = $statusLogRepo->findOneBy(array('id' => $statusLogId));
+            $this->assertNotNull($statusLog);
+
+            $statusLogs[] = $statusLog;
+        }
+
+        $searchManager->remove($statusLogs);
+        $searchManager->flush();
+        sleep(1);
+
+        foreach($statusLogIds as $statusLogId) {
+            $statusLog = $statusLogRepo->find($statusLogId);
+            $this->assertNull($statusLog);
+        }
+    }
+
     public function testRemoveAll()
     {
         $this->createData();
@@ -225,10 +289,21 @@ class SearchManagerTest extends BaseTestCase
         $searchManager->flush();
         sleep(1);
 
-        foreach($views as $originalView) {
-            $view = $viewRepo->findOneBy(array('id' => $originalView->getId()));
-            $this->assertNull($view);
-        }
+        /** @var ElasticsearchEntityCollection $views */
+        $views = $viewRepo->findAll();
+        $this->assertTrue($views->getTotal() == 0);
+    }
+
+    public function testRemoveAllTimeSeriesByRemoveAll()
+    {
+        $this->createTimeSeriesData();
+        $searchManager = $this->getSearchManager();
+        $statusLogRepo = $searchManager->getRepository(StatusLog::class);
+        $statusLogs = $statusLogRepo->findAll();
+        $this->assertTrue($statusLogs->getTotal() > 0);
+
+        $this->setExpectedException('RuntimeException');
+        $searchManager->removeAll($searchManager->getClassMetadata(StatusLog::class));
     }
 
     public function testUpdate()
@@ -385,23 +460,38 @@ class SearchManagerTest extends BaseTestCase
         $exceptionMessage = null;
         try {
             foreach ($metadatas as $metadata) {
-                $this->assertTrue($client->getIndex($metadata->index)->exists());
-                if ($client->getIndex($metadata->index)->exists()) {
-                    $client->deleteIndex($metadata->index);
+                $indexName = $indexName = $this->getIndexNameForTimeSeriesTestDate($metadata);
+                $this->assertTrue($client->getIndex($indexName)->exists());
+                if ($client->getIndex($indexName)->exists()) {
+                    $client->deleteIndex($indexName);
                 }
             }
             // Recreate indexes and types
             foreach ($metadatas as $metadata) {
-                $this->assertTrue(!$client->getIndex($metadata->index)->exists());
-                if (!$client->getIndex($metadata->index)->exists()) {
-                    $client->createIndex($metadata->index);
+                $indexName = $this->getIndexNameForTimeSeriesTestDate($metadata);
+                $this->assertTrue(! $client->getIndex($indexName)->exists());
+                if (!$client->getIndex($indexName)->exists()) {
+                    $client->createIndex($indexName);
                 }
                 $client->createType($metadata);
-                $this->assertNotNull($client->getIndex($metadata->index)->getMapping());
+                $this->assertNotNull($client->getIndex($indexName)->getMapping());
             }
         } catch (\Exception $e) {
             $exceptionMessage = $e->getMessage();
         }
         $this->assertNull($exceptionMessage, $exceptionMessage);
+    }
+
+    /**
+     * Appends a test date suffix to the base index name for a time series index
+     * @param ClassMetadata $metadata
+     * @return string
+     */
+    private function getIndexNameForTimeSeriesTestDate($metadata){
+        $indexName = $metadata->index;
+        if (isset($metadata->timeSeriesScale)) {
+            $indexName = $metadata->index . BaseTestCase::TIME_SERIES_TEST_DATE_SUFFIX;
+        }
+        return $indexName;
     }
 }

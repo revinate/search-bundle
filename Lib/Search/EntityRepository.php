@@ -161,11 +161,12 @@ class EntityRepository implements ObjectRepository
      * Execute a delete on the associated index and type
      *
      * @param BaseElasticsearchEntity $entity
+     * @param bool $refresh
      */
-    public function delete($entity)
+    public function delete($entity, $refresh = false)
     {
         $this->_sm->remove($entity);
-        $this->_sm->flush($entity);
+        $this->_sm->flush($entity, $refresh);
     }
 
     /**

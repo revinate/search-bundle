@@ -164,6 +164,10 @@ class Client implements SearchClientInterface
     public function removeAll(ClassMetadata $class, $query = null)
     {
         $index = $class->getIndexForRead();
+        if ($class->timeSeriesField) {
+            // CRUD APIs are single-index APIs. See https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html
+            throw new \RuntimeException(__METHOD__ . ": Unable to perform remove all action on multiple indices for " . $index);
+        }
         $query = $query ?: new MatchAll();
         $this->deleteByScanScroll($class, $query, $index);
     }
