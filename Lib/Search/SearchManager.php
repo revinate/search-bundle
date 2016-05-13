@@ -24,6 +24,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Revinate\SearchBundle\Lib\Search\ElasticSearch\Client;
 use Revinate\SearchBundle\Lib\Search\Exception\InvalidArgumentException;
 use Revinate\SearchBundle\Lib\Search\Exception\UnexpectedTypeException;
+use Revinate\SearchBundle\Lib\Search\Mapping\ClassMetadata;
 use Elastica\Filter\BoolAnd;
 
 /**
@@ -271,6 +272,19 @@ class SearchManager implements ObjectManager
             }
             $this->unitOfWork->remove($object);
         }
+    }
+
+    /**
+     * Remove the objects from the index
+     *
+     * @param ClassMetadata $class
+     * @param object        $query
+     *
+     * @throws UnexpectedTypeException
+     */
+    public function removeAll(ClassMetadata $class, $query = null)
+    {
+        $this->client->removeAll($class, $query);
     }
 
     /**

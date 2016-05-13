@@ -112,7 +112,7 @@ class EntityRepositoryCollection implements ObjectRepository
     }
 
     /**
-     * Execute a direct delete by query on the associated index and type
+     * Execute a direct delete on the associated index and type
      *
      * @param object $query
      */

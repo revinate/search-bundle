@@ -6,6 +6,7 @@ use Revinate\SearchBundle\Lib\Search\ElasticSearch\MappingManager;
 use Revinate\SearchBundle\Lib\Search\ElasticSearch\RevinateElastica\Template;
 use Revinate\SearchBundle\Service\ElasticaService;
 use Revinate\SearchBundle\Test\Entity\View;
+use Revinate\SearchBundle\Test\Entity\StatusLog;
 
 class MappingManagerTest extends BaseTestCase {
     protected function setUp() {
@@ -31,6 +32,23 @@ class MappingManagerTest extends BaseTestCase {
 
         $template = new Template($this->getSearchManager()->getClient()->getClient());
         $this->verifyTemplate($template->getTemplate(View::INDEX_NAME));
+
+        self::$mappingManager->deleteAllIndices();
+        $this->assertFalse($index->exists());
+    }
+
+    public function testUpdateTimeSeries() {
+        $index = $this->elasticaClient->getIndex(StatusLog::INDEX_NAME . BaseTestCase::TIME_SERIES_TEST_DATE_SUFFIX);
+        $this->assertFalse($index->exists());
+
+        self::$mappingManager->update();
+        $this->assertTrue($index->exists());
+
+        $this->verifySettings($index->getSettings());
+        $this->verifyTimeSeriesMapping($index->getMapping());
+
+        $template = new Template($this->getSearchManager()->getClient()->getClient());
+        $this->verifyTimeSeriesTemplate($template->getTemplate(StatusLog::INDEX_NAME));
 
         self::$mappingManager->deleteAllIndices();
         $this->assertFalse($index->exists());
@@ -98,6 +116,37 @@ class MappingManagerTest extends BaseTestCase {
         $this->assertEquals($expectedMapping, $mapping);
     }
 
+    protected function verifyTimeSeriesMapping(array $mapping) {
+        $expectedMapping = array(
+            'status_logs' =>
+                array(
+                    '_id'        =>
+                        array(
+                            'path' => 'id',
+                        ),
+                    'properties' =>
+                        array(
+                            'id'      =>
+                                array(
+                                    'type'  => 'string',
+                                    'index' => 'not_analyzed'
+                                ),
+                            'date'    =>
+                                array(
+                                    'type'   => 'date',
+                                    'format' => 'dateOptionalTime',
+                                ),
+                            'status'  =>
+                                array(
+                                    'type'           => 'string',
+                                    'include_in_all' => false,
+                                ),
+                        ),
+                ),
+        );
+        $this->assertEquals($expectedMapping, $mapping);
+    }
+
     protected function verifyTemplate(array $template) {
         $expectedTemplate = array(
             'order'    => 0,
@@ -156,6 +205,48 @@ class MappingManagerTest extends BaseTestCase {
                                         array(
                                             'type'  => 'string',
                                             'index' => 'not_analyzed'
+                                        ),
+                                ),
+                        ),
+                ),
+            'aliases'  =>
+                array(),
+        );
+        $this->assertEquals($expectedTemplate, $template);
+    }
+
+    protected function verifyTimeSeriesTemplate(array $template) {
+        $expectedTemplate = array(
+            'order'    => 0,
+            'template' => 'test_revinate_search_bundle_time_series_*',
+            'settings' =>
+                array(
+                    'index.number_of_replicas' => '0',
+                    'index.number_of_shards'   => '2',
+                ),
+            'mappings' =>
+                array(
+                    'status_logs' =>
+                        array(
+                            '_id'        =>
+                                array(
+                                    'path' => 'id',
+                                ),
+                            'properties' =>
+                                array(
+                                    'id'      =>
+                                        array(
+                                            'type'  => 'string',
+                                            'index' => 'not_analyzed'
+                                        ),
+                                    'date'    =>
+                                        array(
+                                            'type'   => 'date',
+                                        ),
+                                    'status'  =>
+                                        array(
+                                            'type'           => 'string',
+                                            'include_in_all' => false,
                                         ),
                                 ),
                         ),

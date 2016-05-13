@@ -1,0 +1,18 @@
+{
+  "_all": {
+    "enabled": false
+  },
+  "_id": {
+    "store": "yes",
+    "index": "not_analyzed"
+  },
+  "properties": {
+    "date": {
+      "type": "date",
+      "format": "dateOptionalTime"
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}

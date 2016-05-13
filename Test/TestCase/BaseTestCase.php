@@ -7,6 +7,7 @@ use Revinate\SearchBundle\Lib\Search\ElasticSearch\MappingManager;
 use Revinate\SearchBundle\Lib\Search\SearchManager;
 use Revinate\SearchBundle\Service\ElasticaService;
 use Revinate\SearchBundle\Test\Entity\View;
+use Revinate\SearchBundle\Test\Entity\StatusLog;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -24,12 +25,18 @@ class BaseTestCase extends WebTestCase
     protected $elasticaClient;
     /** @var  \Elastica\Index */
     protected $index;
+    /** @var  \Elastica\Index */
+    protected $timeSeriesIndex;
     /** @var  \Elastica\Type */
     protected $type;
+    /** @var  \Elastica\Type */
+    protected $timeSeriesType;
     /** @var MappingManager */
     protected static $mappingManager;
     /** @var SearchManager */
     protected static $searchManager;
+
+    const TIME_SERIES_TEST_DATE_SUFFIX = "_2016_05";
 
     /**
      * Initialize function, which will only be run once
@@ -94,6 +101,17 @@ class BaseTestCase extends WebTestCase
             $this->type->setMapping($mapping);
         } else {
             $this->type = new \Elastica\Type($this->index, View::INDEX_TYPE);
+        }
+
+        $this->timeSeriesIndex = new \Elastica\Index($this->elasticaClient, StatusLog::INDEX_NAME . BaseTestCase::TIME_SERIES_TEST_DATE_SUFFIX);
+        if (! $this->timeSeriesIndex->exists()) {
+            $this->timeSeriesIndex->create(array("index.number_of_replicas" => "0", "index.number_of_shards" => "1"));
+            $this->timeSeriesType = new \Elastica\Type($this->timeSeriesIndex, StatusLog::INDEX_TYPE);
+            $mappingJson = json_decode(file_get_contents(__DIR__ . "/../data/es/statusLogMapping.json"), true);
+            $mapping = new \Elastica\Type\Mapping($this->timeSeriesType, $mappingJson['properties']);
+            $this->timeSeriesType->setMapping($mapping);
+        } else {
+            $this->timeSeriesType = new \Elastica\Type($this->timeSeriesIndex, StatusLog::INDEX_TYPE);
         }
     }
 
