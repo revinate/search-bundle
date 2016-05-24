@@ -184,7 +184,6 @@ class EntityRepository implements ObjectRepository
             }
             $this->_sm->flush();
         }
-        $this->_sm->clear();
     }
 
     /**
