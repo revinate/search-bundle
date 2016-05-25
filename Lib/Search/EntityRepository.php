@@ -176,14 +176,7 @@ class EntityRepository implements ObjectRepository
      */
     public function deleteByQuery($query)
     {
-        $queryCriteria = $query->getQuery();
-        $results = $this->scanBy($queryCriteria);
-        foreach ($results as $collection) {
-            foreach ($collection as $entity) {
-                $this->delete($entity, false);
-            }
-            $this->_sm->flush();
-        }
+        $this->_sm->getClient()->removeAll($this->_class, $query);
     }
 
     /**
