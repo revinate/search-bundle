@@ -36,7 +36,8 @@ class BaseTestCase extends WebTestCase
     /** @var SearchManager */
     protected static $searchManager;
 
-    const TIME_SERIES_TEST_DATE_SUFFIX = "_2016_05";
+    /** @var string */
+    protected static $timeSeriesTestDateSuffix;
 
     /**
      * Initialize function, which will only be run once
@@ -46,6 +47,7 @@ class BaseTestCase extends WebTestCase
         ini_set('error_reporting', E_ALL);
         ini_set('display_errors', '1');
         ini_set('display_startup_errors', '1');
+        self::$timeSeriesTestDateSuffix = date('\_Y\_m');
         if (!self::$initialized) {
             self::$kernel = new AppKernel('test', true);
             self::$kernel->boot();
@@ -103,7 +105,7 @@ class BaseTestCase extends WebTestCase
             $this->type = new \Elastica\Type($this->index, View::INDEX_TYPE);
         }
 
-        $this->timeSeriesIndex = new \Elastica\Index($this->elasticaClient, StatusLog::INDEX_NAME . BaseTestCase::TIME_SERIES_TEST_DATE_SUFFIX);
+        $this->timeSeriesIndex = new \Elastica\Index($this->elasticaClient, StatusLog::INDEX_NAME . self::$timeSeriesTestDateSuffix);
         if (! $this->timeSeriesIndex->exists()) {
             $this->timeSeriesIndex->create(array("index.number_of_replicas" => "0", "index.number_of_shards" => "1"));
             $this->timeSeriesType = new \Elastica\Type($this->timeSeriesIndex, StatusLog::INDEX_TYPE);

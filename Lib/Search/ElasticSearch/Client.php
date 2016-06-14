@@ -176,10 +176,10 @@ class Client implements SearchClientInterface
      * Perform a scan and scroll through the results, bulk deleting by result ids
      *
      * @param ClassMetadata $class
-     * @param AbstractQuery $scanQuery
+     * @param object        $scanQuery
      * @param string        $index
      */
-    private function deleteByScanScroll(ClassMetadata $class, AbstractQuery $scanQuery, $index) {
+    private function deleteByScanScroll(ClassMetadata $class, $scanQuery, $index) {
         $type = $this->getIndex($index)->getType($class->type);
         $query = Query::create($scanQuery);
         $results = $this->scan($query, array($class));

@@ -38,7 +38,7 @@ class MappingManagerTest extends BaseTestCase {
     }
 
     public function testUpdateTimeSeries() {
-        $index = $this->elasticaClient->getIndex(StatusLog::INDEX_NAME . BaseTestCase::TIME_SERIES_TEST_DATE_SUFFIX);
+        $index = $this->elasticaClient->getIndex(StatusLog::INDEX_NAME . self::$timeSeriesTestDateSuffix);
         $this->assertFalse($index->exists());
 
         self::$mappingManager->update();
