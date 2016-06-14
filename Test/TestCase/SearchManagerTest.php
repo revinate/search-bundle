@@ -490,7 +490,7 @@ class SearchManagerTest extends BaseTestCase
     private function getIndexNameForTimeSeriesTestDate($metadata){
         $indexName = $metadata->index;
         if (isset($metadata->timeSeriesScale)) {
-            $indexName = $metadata->index . BaseTestCase::TIME_SERIES_TEST_DATE_SUFFIX;
+            $indexName = $metadata->index . self::$timeSeriesTestDateSuffix;
         }
         return $indexName;
     }
