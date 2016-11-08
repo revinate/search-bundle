@@ -21,6 +21,7 @@ namespace Revinate\SearchBundle\Lib\Search\ElasticSearch;
 
 use Revinate\SearchBundle\Lib\Search\Criteria\Exists;
 use Revinate\SearchBundle\Lib\Search\Criteria\Missing;
+use Revinate\SearchBundle\Lib\Search\Criteria\Nested;
 use Revinate\SearchBundle\Lib\Search\Criteria\Not;
 use Revinate\SearchBundle\Lib\Search\Criteria\Range;
 use Revinate\SearchBundle\Lib\Search\ElasticSearch\RevinateElastica\Template;
@@ -42,7 +43,6 @@ use Elastica\Type;
 use Elastica\Type\Mapping;
 use Elastica\Document;
 use Elastica\Index;
-use Elastica\Query\AbstractQuery;
 use Elastica\Query\MatchAll;
 use Elastica\Filter\Term;
 use Elastica\Search;
@@ -318,6 +318,8 @@ class Client implements SearchClientInterface
                 $filter->addFilter($this->getExistsFilter($key));
             } elseif ($value instanceof Missing) {
                 $filter->addFilter($this->getMissingFilter($key, $value));
+            } elseif ($value instanceOf Nested) {
+                $filter->addFilter($this->getNestedFilter($key, $value));
             } else {
                 $filter->addFilter($this->getTermOrTermsFilter($key, $value));
             }
@@ -691,6 +693,20 @@ class Client implements SearchClientInterface
         if (null !== $missing->getNullValue()) {
             $filter->setParam('null_value', $missing->getNullValue());
         }
+        return $filter;
+    }
+
+    /**
+     * @param string $field
+     * @param Nested $nested
+     *
+     * @return \Elastica\Filter\Nested
+     */
+    protected function getNestedFilter($field, $nested)
+    {
+        $filter = new \Elastica\Filter\Nested($field);
+        $filter->setPath($field);
+        $filter->setFilter($this->generateAndFilterBy($nested->getCriteria()));
         return $filter;
     }
 
