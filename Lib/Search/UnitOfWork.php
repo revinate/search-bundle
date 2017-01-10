@@ -286,8 +286,6 @@ class UnitOfWork
 
         if (!empty($options['useRealtime'])) {
             $document = $client->get($class, $value, $options, $index);
-        } elseif (isset($options['field'])) {
-            $document = $client->findOneBy($class, $options['field'], $value);
         } else {
             $document = $client->find($class, $value, $options);
         }
