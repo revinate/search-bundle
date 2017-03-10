@@ -86,4 +86,9 @@ final class ElasticField extends Field
      * @var string
      */
     public $format;
+
+    /**
+     * @var string
+     */
+    public $column;
 }

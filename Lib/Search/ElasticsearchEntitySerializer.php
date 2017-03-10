@@ -77,11 +77,20 @@ class ElasticsearchEntitySerializer
                             }
                         }
                         break;
+                    case 'object':
+                        if ($propertyValue instanceof BaseElasticsearchEntity) {
+                            $propertyValue = $this->serialize($propertyValue);
+                        }
+                        break;
                     default:
                         break;
                 }
 
-                $esDocument[$property->name] = $propertyValue;
+                $columnName = $property->name;
+                if (! empty($elasticFieldAnnotation->column)) {
+                    $columnName = $elasticFieldAnnotation->column;
+                }
+                $esDocument[$columnName] = $propertyValue;
             }
         }
         return $esDocument;
@@ -151,7 +160,12 @@ class ElasticsearchEntitySerializer
             /** @var ElasticField $elasticFieldAnnotation */
             $elasticFieldAnnotation = self::$reader->getPropertyAnnotation($property, $this->elasticFieldAnnotationClass);
             if ($elasticFieldAnnotation || $property->getName() == 'score') {
-                $propertyValue = isset($esDocument[$property->name]) ? $esDocument[$property->name] : null;
+                $columnName = $property->name;
+                if ($elasticFieldAnnotation && !empty($elasticFieldAnnotation->column)) {
+                    $columnName = $elasticFieldAnnotation->column;
+                }
+                $propertyValue = isset($esDocument[$columnName]) ? $esDocument[$columnName] : null;
+
                 if ($elasticFieldAnnotation) {
                     switch ($elasticFieldAnnotation->type) {
                         // @todo[daiyi]: add more handler if necessary
