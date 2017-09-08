@@ -19,6 +19,7 @@
 
 namespace Revinate\SearchBundle\Lib\Search\ElasticSearch;
 
+use Revinate\SearchBundle\Lib\Search\Criteria\BoolOr;
 use Revinate\SearchBundle\Lib\Search\Criteria\Exists;
 use Revinate\SearchBundle\Lib\Search\Criteria\Missing;
 use Revinate\SearchBundle\Lib\Search\Criteria\Nested;
@@ -34,7 +35,6 @@ use Elastica\Exception\NotFoundException;
 use Elastica\Filter\AbstractMulti;
 use Elastica\Filter\BoolAnd;
 use Elastica\Filter\BoolNot;
-use Elastica\Filter\BoolOr;
 use Elastica\Filter\HasChild;
 use Elastica\Filter\HasParent;
 use Elastica\Filter\Terms;
@@ -290,7 +290,7 @@ class Client implements SearchClientInterface
      */
     protected function generateOrFilterBy(array $criteria)
     {
-        return $this->generateFilterHelper(new BoolOr(), $criteria);
+        return $this->generateFilterHelper(new \Elastica\Filter\BoolOr(), $criteria);
     }
 
     /**
@@ -308,6 +308,8 @@ class Client implements SearchClientInterface
                 $filter->addFilter($this->getFilterForHasParentOrHasChild($key, $value));
             } elseif ($key == SearchManager::CRITERIA_OR) {
                 $filter->addFilter($this->generateOrFilterBy($value));
+            } elseif ($value instanceof BoolOr) {
+                $filter->addFilter($this->generateOrFilterBy($value->getCriteria()));
             } elseif ($key == SearchManager::CRITERIA_AND) {
                 $filter->addFilter($this->generateAndFilterBy($value));
             } elseif ($value instanceof Range) {
