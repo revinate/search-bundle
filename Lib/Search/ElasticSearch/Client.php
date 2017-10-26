@@ -19,6 +19,7 @@
 
 namespace Revinate\SearchBundle\Lib\Search\ElasticSearch;
 
+use Revinate\SearchBundle\Lib\Search\Criteria\BoolAnd;
 use Revinate\SearchBundle\Lib\Search\Criteria\BoolOr;
 use Revinate\SearchBundle\Lib\Search\Criteria\Exists;
 use Revinate\SearchBundle\Lib\Search\Criteria\Missing;
@@ -33,7 +34,6 @@ use Revinate\SearchBundle\Lib\Search\SearchManager;
 use Elastica\Client as ElasticaClient;
 use Elastica\Exception\NotFoundException;
 use Elastica\Filter\AbstractMulti;
-use Elastica\Filter\BoolAnd;
 use Elastica\Filter\BoolNot;
 use Elastica\Filter\HasChild;
 use Elastica\Filter\HasParent;
@@ -280,7 +280,7 @@ class Client implements SearchClientInterface
      */
     protected function generateAndFilterBy(array $criteria)
     {
-        return $this->generateFilterHelper(new BoolAnd(), $criteria);
+        return $this->generateFilterHelper(new \Elastica\Filter\BoolAnd(), $criteria);
     }
 
     /**
@@ -306,12 +306,14 @@ class Client implements SearchClientInterface
         foreach ($criteria as $key => $value) {
             if ($this->isHasChild($key) || $this->isHasParent($key)) {
                 $filter->addFilter($this->getFilterForHasParentOrHasChild($key, $value));
-            } elseif ($key == SearchManager::CRITERIA_OR) {
+            } elseif ($key === SearchManager::CRITERIA_OR) {
                 $filter->addFilter($this->generateOrFilterBy($value));
             } elseif ($value instanceof BoolOr) {
                 $filter->addFilter($this->generateOrFilterBy($value->getCriteria()));
-            } elseif ($key == SearchManager::CRITERIA_AND) {
+            } elseif ($key === SearchManager::CRITERIA_AND) {
                 $filter->addFilter($this->generateAndFilterBy($value));
+            } elseif ($value instanceof BoolAnd) {
+                $filter->addFilter($this->generateAndFilterBy($value->getCriteria()));
             } elseif ($value instanceof Range) {
                 $filter->addFilter($this->getRangeFilter($key, $value));
             } elseif ($value instanceof Not) {
