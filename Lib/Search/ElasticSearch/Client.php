@@ -240,10 +240,10 @@ class Client implements SearchClientInterface
     /**
      * {@inheritdoc}
      */
-    public function generateQueryBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function generateQueryBy(array $criteria, array $orderBy = null, $limit = null, $offset = null, array $extraParams = [])
     {
         $query = new Query();
-
+        $query->setParams($extraParams);
         if (empty($criteria)) {
             $query->setQuery(new MatchAll());
         } else {
@@ -334,9 +334,9 @@ class Client implements SearchClientInterface
     /**
      * {@inheritDoc}
      */
-    public function findBy(ClassMetadata $class, array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy(ClassMetadata $class, array $criteria, array $orderBy = null, $limit = null, $offset = null, array $extraParams = [])
     {
-        $query = $this->generateQueryBy($criteria, $orderBy, $limit, $offset);
+        $query = $this->generateQueryBy($criteria, $orderBy, $limit, $offset, $extraParams);
         return $this->search($query, array($class));
     }
 
@@ -379,14 +379,16 @@ class Client implements SearchClientInterface
     }
 
     /**
-     * @param Query $query
+     * @param Query           $query
      * @param ClassMetadata[] $classes
-     * @param int $sizePerShard Size of documents to be returned per shard
-     * @param string $expiryTime Expiration time of the scroll
+     * @param int             $sizePerShard Size of documents to be returned per shard
+     * @param string          $expiryTime   Expiration time of the scroll
+     *
+     * @param array           $extraParams
      *
      * @return ScanAndScroll
      */
-    public function scan(Query $query, array $classes, $sizePerShard = 100, $expiryTime = '1m')
+    public function scan(Query $query, array $classes, $sizePerShard = 100, $expiryTime = '1m', $extraParams = [])
     {
         $elasticaSearch = $this->buildQuery($classes);
         $elasticaSearch->setQuery($query);

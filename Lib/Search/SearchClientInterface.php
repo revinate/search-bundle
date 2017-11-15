@@ -62,12 +62,15 @@ interface SearchClientInterface
      * Finds document by specified criteria.
      *
      * @param ClassMetadata $class
-     * @param array $criteria
-     * @param array $orderBy
-     * @param int $limit
-     * @param int $offset
+     * @param array         $criteria
+     * @param array         $orderBy
+     * @param int           $limit
+     * @param int           $offset
+     * @param array         $extraParams
+     *
+     * @return
      */
-    public function findBy(ClassMetadata $class, array $criteria, array $orderBy = null, $limit = null, $offset = null);
+    public function findBy(ClassMetadata $class, array $criteria, array $orderBy = null, $limit = null, $offset = null, array $extraParams = []);
 
     /**
      * Finds all documents
@@ -158,12 +161,13 @@ interface SearchClientInterface
      *
      * @param array $criteria
      * @param array $orderBy
-     * @param int $limit
-     * @param int $offset
+     * @param int   $limit
+     * @param int   $offset
+     * @param array $extraParams
      *
      * @return Query
      */
-    public function generateQueryBy(array $criteria, array $orderBy = null, $limit = null, $offset = null);
+    public function generateQueryBy(array $criteria, array $orderBy = null, $limit = null, $offset = null, array $extraParams = []);
 
     /**
      * Generate filter used by generateQueryBy()

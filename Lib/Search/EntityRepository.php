@@ -100,50 +100,58 @@ class EntityRepository implements ObjectRepository
      * an UnexpectedValueException if certain values of the sorting or limiting details are
      * not supported.
      *
-     * @throws \UnexpectedValueException
-     * @param array $criteria
+     *
+     * @param array      $criteria
      * @param array|null $orderBy
-     * @param int|null $limit
-     * @param int|null $offset
-     * @return mixed The objects.
+     * @param int|null   $limit
+     * @param int|null   $offset
+     * @param array      $extraParams
+     *
+     * @return mixed
      */
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null, array $extraParams = [])
     {
-        return $this->_sm->getUnitOfWork()->loadBy($this->_class, $criteria, $orderBy, $limit, $offset);
+        return $this->_sm->getUnitOfWork()->loadBy($this->_class, $criteria, $orderBy, $limit, $offset, $extraParams);
     }
 
     /**
      * @param ClassMetadata[] $criteria
-     * @param int $sizePerShard Size of documents to be returned per shard
-     * @param string $expiryTime Expiration time of the scroll
+     * @param int             $sizePerShard Size of documents to be returned per shard
+     * @param string          $expiryTime   Expiration time of the scroll
+     * @param array           $extraParams
      *
      * @return \Generator
      */
-    public function scanBy(array $criteria, $sizePerShard = 100, $expiryTime = '1m')
+    public function scanBy(array $criteria, $sizePerShard = 100, $expiryTime = '1m', array $extraParams = [])
     {
-        return $this->_sm->getUnitOfWork()->scanBy($this->_class, $criteria, $sizePerShard, $expiryTime);
+        return $this->_sm->getUnitOfWork()->scanBy($this->_class, $criteria, $sizePerShard, $expiryTime, $extraParams);
     }
 
     /**
      * Finds a single object by a set of criteria.
      *
      * @param array $criteria
+     * @param array $extraParams
+     *
      * @return object The object.
      */
-    public function findOneBy(array $criteria)
+    public function findOneBy(array $criteria, array $extraParams = [])
     {
-        $collection = $this->_sm->getUnitOfWork()->loadBy($this->_class, $criteria);
+        $collection = $this->_sm->getUnitOfWork()->loadBy($this->_class, $criteria, $extraParams);
         return $collection->isEmpty() ? null : $collection->first();
     }
 
     /**
      * @see EntityRepository::findOneBy
+     *
      * @param array $criteria
+     * @param array $extraParams
+     *
      * @return Option
      */
-    public function findOneOptionBy(array $criteria)
+    public function findOneOptionBy(array $criteria, array $extraParams = [])
     {
-        return Option::fromValue($this->findOneBy($criteria));
+        return Option::fromValue($this->findOneBy($criteria, $extraParams));
     }
 
     /**
