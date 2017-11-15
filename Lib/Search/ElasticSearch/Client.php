@@ -384,11 +384,9 @@ class Client implements SearchClientInterface
      * @param int             $sizePerShard Size of documents to be returned per shard
      * @param string          $expiryTime   Expiration time of the scroll
      *
-     * @param array           $extraParams
-     *
      * @return ScanAndScroll
      */
-    public function scan(Query $query, array $classes, $sizePerShard = 100, $expiryTime = '1m', $extraParams = [])
+    public function scan(Query $query, array $classes, $sizePerShard = 100, $expiryTime = '1m')
     {
         $elasticaSearch = $this->buildQuery($classes);
         $elasticaSearch->setQuery($query);
