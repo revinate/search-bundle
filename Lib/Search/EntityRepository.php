@@ -124,7 +124,7 @@ class EntityRepository implements ObjectRepository
      */
     public function scanBy(array $criteria, $sizePerShard = 100, $expiryTime = '1m', array $extraParams = [])
     {
-        yield $this->_sm->getUnitOfWork()->scanBy($this->_class, $criteria, $sizePerShard, $expiryTime, $extraParams);
+        return $this->_sm->getUnitOfWork()->scanBy($this->_class, $criteria, $sizePerShard, $expiryTime, $extraParams);
     }
 
     /**
