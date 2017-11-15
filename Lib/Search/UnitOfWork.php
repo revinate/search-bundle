@@ -300,30 +300,33 @@ class UnitOfWork
      * Load and hydrate documents based on critera
      *
      * @param ClassMetadata $class
-     * @param array $criteria
-     * @param array|null $orderBy
-     * @param int $limit
-     * @param int $offset
+     * @param array         $criteria
+     * @param array|null    $orderBy
+     * @param int           $limit
+     * @param int           $offset
+     * @param array         $extraParams
      *
      * @return ArrayCollection
      */
-    public function loadBy(ClassMetadata $class, array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function loadBy(ClassMetadata $class, array $criteria, array $orderBy = null, $limit = null, $offset = null, array $extraParams = [])
     {
-        $results = $this->sm->getClient()->findBy($class, $criteria, $orderBy, $limit, $offset);
+        $results = $this->sm->getClient()->findBy($class, $criteria, $orderBy, $limit, $offset, $extraParams);
         return $this->hydrateCollection(array($class), $results);
     }
 
     /**
      * @param ClassMetadata $class
-     * @param array $criteria
-     * @param int $sizePerShard
-     * @param string $expiryTime
+     * @param array         $criteria
+     * @param int           $sizePerShard
+     * @param string        $expiryTime
+     * @param array         $extraParams
      *
      * @return \Generator
      */
-    public function scanBy(ClassMetadata $class, array $criteria, $sizePerShard = 100, $expiryTime = '1m')
+    public function scanBy(ClassMetadata $class, array $criteria, $sizePerShard = 100, $expiryTime = '1m', array $extraParams = [])
     {
-        $iterator = $this->sm->getClient()->scan($this->sm->generateQueryBy($criteria), [$class], $sizePerShard, $expiryTime);
+        $query = $this->sm->generateQueryBy($criteria, [], null, null, $extraParams);
+        $iterator = $this->sm->getClient()->scan($query, [$class], $sizePerShard, $expiryTime);
         return $this->hydrateScanAndScrollIterator([$class], $iterator);
     }
 

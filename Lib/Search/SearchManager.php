@@ -310,16 +310,17 @@ class SearchManager implements ObjectManager
     /**
      * Generate query used by findBy()
      *
-     * @param array $criteria
+     * @param array      $criteria
      * @param array|null $orderBy
-     * @param int $limit
-     * @param int $offset
+     * @param int        $limit
+     * @param int        $offset
+     * @param array      $extraParams
      *
      * @return \Elastica\Query
      */
-    public function generateQueryBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function generateQueryBy(array $criteria, array $orderBy = null, $limit = null, $offset = null, array $extraParams = [])
     {
-        return $this->client->generateQueryBy($criteria, $orderBy, $limit, $offset);
+        return $this->client->generateQueryBy($criteria, $orderBy, $limit, $offset, $extraParams);
     }
 
     /**
