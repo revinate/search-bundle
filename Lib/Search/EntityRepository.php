@@ -137,7 +137,7 @@ class EntityRepository implements ObjectRepository
      */
     public function findOneBy(array $criteria, array $extraParams = [])
     {
-        $collection = $this->_sm->getUnitOfWork()->loadBy($this->_class, $criteria, $extraParams);
+        $collection = $this->_sm->getUnitOfWork()->loadBy($this->_class, $criteria, null, null, $extraParams);
         return $collection->isEmpty() ? null : $collection->first();
     }
 
