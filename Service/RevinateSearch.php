@@ -22,11 +22,11 @@ class RevinateSearch
 
     /**
      *
-     * @param array $connection
+     * @param array $connections
      * @param array $paths Array of Paths where Search Entities are found
      * @param \AppKernel $kernel
      */
-    public function __construct(Array $connection, Array $paths = array(), \AppKernel $kernel)
+    public function __construct(array $connections, array $paths = array(), \AppKernel $kernel)
     {
         $cacheProvider = 'Doctrine\Common\Cache\ArrayCache';
 
@@ -46,7 +46,7 @@ class RevinateSearch
         }
         $config->setEntityNamespaces($entityNamespaces);
 
-        $client = new \Elastica\Client(array('connections' => array($connection)));
+        $client = new \Elastica\Client(array('connections' => array($connections)));
         $this->searchManager = new SearchManager(
             $config,
             new \Revinate\SearchBundle\Lib\Search\ElasticSearch\Client($client),

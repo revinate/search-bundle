@@ -23,9 +23,9 @@
     "jms/serializer": ">=0.14.0",
     "php": ">=5.5.0",
     "phpoption/phpoption": ">=0.9",
-    "symfony/yaml": ">=2.4.8 <3.0",
-    "symfony/dependency-injection": ">=2.4.8 <3.0",
-    "symfony/config": ">=2.4.8 <3.0"
+    "symfony/yaml": ">=2.4.8",
+    "symfony/dependency-injection": ">=2.4.8",
+    "symfony/config": ">=2.4.8"
   },
   "suggest": {
     "ruflin/Elastica": "Elastica version correlating to your Elasticsearch installation is required. This bundle uses filters which are deprecated in Elasticsearch 2."
