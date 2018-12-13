@@ -5,27 +5,27 @@ services:
     revinate_search:
         class: Revinate\SearchBundle\Service\RevinateSearch
         arguments:
-            connections: "%revinate_search.config.connections%"
-            paths: "%revinate_search.config.paths%"
-            kernel: "@kernel"
+            - "%revinate_search.config.connections%"
+            - "%revinate_search.config.paths%"
+            - "@kernel"
     revinate_search.search_manager:
         class: Revinate\SearchBundle\Lib\Search\SearchManager
         arguments:
-            config: "@revinate_search.internal.configuration"
-            client: "@revinate_search.internal.client"
-            eventManager: "@revinate_search.internal.event_manager"
+            - "@revinate_search.internal.configuration"
+            - "@revinate_search.internal.client"
+            - "@revinate_search.internal.event_manager"
     revinate_search.mapping_manager:
         class: Revinate\SearchBundle\Lib\Search\ElasticSearch\MappingManager
         arguments:
-            sm: "@revinate_search.search_manager"
-            env: "%revinate_search.config.env%"
+            - "@revinate_search.search_manager"
+            - "%revinate_search.config.env%"
 
     # Private services
     revinate_search.internal.elasticsearch_callback_serializer:
         class: Revinate\SearchBundle\Lib\Search\Serializer\CallbackSerializer
         arguments:
-            serializerCallback: toESDocument
-            deserializerCallback: fromESDocument
+            - toESDocument
+            - fromESDocument
         public: false
     revinate_search.internal.cache_provider:
         class: Doctrine\Common\Cache\ArrayCache
